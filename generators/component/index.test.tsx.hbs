@@ -1,0 +1,11 @@
+import * as React from 'react';
+import { render } from '@testing-library/react';
+
+import { {{ properCase componentName }} } from '..';
+
+describe('<{{ properCase componentName }}  />', () => {
+  it('should be in the document', () => {
+    const component = render(<{{ properCase componentName }} />);
+    expect(component.container.firstChild).toBeInTheDocument();
+  });
+});
