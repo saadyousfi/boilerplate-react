@@ -1,0 +1,51 @@
+import {
+  createSlice,
+  createEntityAdapter,
+  createSelector,
+  EntityState,
+  PayloadAction,
+  Update
+} from "@reduxjs/toolkit";
+import { RootState } from "store";
+import { {{TypeName}} } from "types";
+
+type {{properCase realSliceName}}State ={
+  data: EntityState<{{TypeName}}>
+};
+
+const entity = createEntityAdapter<{{TypeName}}>();
+const initialState: {{properCase realSliceName}}State = {data: entity.getInitialState()};
+
+const slice = createSlice({
+  name: "{{realSliceName}}",
+  initialState,
+  reducers: {
+    setAll: (state, action: PayloadAction<{{TypeName}}[]>) => {
+      entity.setAll(state.data, action.payload);
+    },
+    addOne: (state, action: PayloadAction<{{TypeName}}>) => {
+      entity.addOne(state.data, action.payload);
+    },
+    updateOne: (state, action: PayloadAction<Update<{{TypeName}}>>) => {
+      entity.updateOne(state.data, action.payload);
+    },
+    removeOne: (state, action: PayloadAction<string>) => {
+      entity.removeOne(state.data, action.payload);
+    },
+  },
+});
+
+const { actions: {{realSliceName}}Actions, reducer: {{realSliceName}}Reducer } = slice;
+
+export { initialState, {{realSliceName}}Actions, {{realSliceName}}Reducer };
+
+const selectState = (state: RootState) => state.{{realSliceName}};
+const selectData = createSelector([selectState], (state) => state.data)
+const selectAll{{properCase realSliceName}} = createSelector([selectData], (state) =>
+  entity.getSelectors().selectAll(state)
+);
+const select{{TypeName}}ById = createSelector(
+  [selectData, (state: RootState, id: string) => id],
+  (state, id) => entity.getSelectors().selectById(state, id)
+);
+export { selectAll{{properCase realSliceName}}, select{{TypeName}}ById };

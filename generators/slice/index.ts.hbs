@@ -1,0 +1,18 @@
+import { createSlice } from "@reduxjs/toolkit";
+import { RootState } from "store";
+
+type {{properCase realSliceName}}State = {}
+
+const initialState: {{properCase realSliceName}}State = {};
+
+const slice = createSlice({
+  name: "{{realSliceName}}",
+  initialState,
+  reducers: {},
+});
+
+const { reducer: {{realSliceName}}Reducer, actions: {{realSliceName}}Actions } = slice;
+
+export { initialState, {{realSliceName}}Reducer, {{realSliceName}}Actions }
+
+const selectState = (state: RootState) => state.{{realSliceName}};
