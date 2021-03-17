@@ -7,14 +7,20 @@ import {
   Update
 } from "@reduxjs/toolkit";
 import { RootState } from "store";
-import { {{TypeName}} } from "types";
+import { Status, {{TypeName}}, {{TypeName}}Creator } from "types";
 
 type {{properCase realSliceName}}State ={
-  data: EntityState<{{TypeName}}>
+  data: EntityState<{{TypeName}}>;
+  status: Status;
+  error: string | null;
 };
 
 const entity = createEntityAdapter<{{TypeName}}>();
-const initialState: {{properCase realSliceName}}State = {data: entity.getInitialState()};
+const initialState: {{properCase realSliceName}}State = {
+  data: entity.getInitialState(),
+  status: Status.idle,
+  error: null,
+  };
 
 const slice = createSlice({
   name: "{{realSliceName}}",
@@ -32,6 +38,15 @@ const slice = createSlice({
     removeOne: (state, action: PayloadAction<string>) => {
       entity.removeOne(state.data, action.payload);
     },
+    requestFetch: state => state,
+    requestCreate: (state, action: PayloadAction<{{TypeName}}Creator>) => state,
+    requestUpdate: (state, action: PayloadAction<Update<{{TypeName}}>>) => state,
+    requestDelete: (state, action: PayloadAction<string>) => state,
+    setStatus: (state, action: PayloadAction<{status: Status, error: string | null}>) => {
+      const {status, error} = action.payload;
+      state.status = status;
+      state.error = error;
+    }
   },
 });
 
@@ -41,11 +56,10 @@ export { initialState, {{realSliceName}}Actions, {{realSliceName}}Reducer };
 
 const selectState = (state: RootState) => state.{{realSliceName}};
 const selectData = createSelector([selectState], (state) => state.data)
-const selectAll{{properCase realSliceName}} = createSelector([selectData], (state) =>
+export const selectAll{{properCase realSliceName}} = createSelector([selectData], (state) =>
   entity.getSelectors().selectAll(state)
 );
-const select{{TypeName}}ById = createSelector(
+export const select{{TypeName}}ById = createSelector(
   [selectData, (state: RootState, id: string) => id],
   (state, id) => entity.getSelectors().selectById(state, id)
 );
-export { selectAll{{properCase realSliceName}}, select{{TypeName}}ById };

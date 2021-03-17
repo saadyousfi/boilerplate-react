@@ -75,7 +75,9 @@ module.exports = {
         {
           type: 'add',
           path: `${slicePath}/saga.ts`,
-          templateFile: './slice/saga.ts.hbs',
+          templateFile: `./slice/${
+            answers.wantEntity ? 'entity.saga.ts.hbs' : 'saga.ts.hbs'
+          }`,
           abortOnFail: true,
           data: {
             realSliceName: sliceName,
@@ -108,10 +110,20 @@ module.exports = {
     }
     if (answers.wantEntity) {
       actions.push({
+        type: 'add',
+        path: `${slicePath}/api.ts`,
+        templateFile: `./slice/entity.api.ts.hbs`,
+        abortOnFail: true,
+        data: {
+          realSliceName: sliceName,
+          TypeName,
+        },
+      });
+      actions.push({
         type: 'append',
         path: `${typesPath}/index.ts`,
         pattern: />>> \[NEW ENTITY TYPES BELOW\]/,
-        template: `export type ${TypeName} = {}`,
+        template: `export type ${TypeName} = {id: string;}; export type ${TypeName}Creator = Omit<${TypeName}, 'id'>;`,
       });
     }
     actions.push({

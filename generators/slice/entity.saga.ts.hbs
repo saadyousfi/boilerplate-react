@@ -1,0 +1,63 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { call, put, take, takeEvery, select } from "redux-saga/effects";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { {{realSliceName}}Actions, select{{TypeName}}ById } from ".";
+import { Update, PayloadAction } from "@reduxjs/toolkit";
+import { {{TypeName}}, {{TypeName}}Creator, Status} from "types";
+import { RootState } from "store";
+import { fetchMany, updateOne, createOne, deleteOne } from './api';
+
+export function* {{realSliceName}}Saga(){
+  yield takeEvery({{realSliceName}}Actions.requestFetch, fetch{{properCase realSliceName}});
+  yield takeEvery({{realSliceName}}Actions.requestUpdate, update{{TypeName}});
+  yield takeEvery({{realSliceName}}Actions.requestCreate, create{{TypeName}});
+  yield takeEvery({{realSliceName}}Actions.requestDelete, delete{{TypeName}});
+}
+
+export function* fetch{{properCase realSliceName}}(){
+  try {
+    yield put({{realSliceName}}Actions.setStatus({status: Status.loading, error: null}));
+    const {{realSliceName}}:{{TypeName}}[] = yield call(fetchMany);
+    yield put({{realSliceName}}Actions.setAll({{realSliceName}}));
+    yield put({{realSliceName}}Actions.setStatus({status: Status.fulfilled, error: null}));
+  } catch(error) {
+    yield put({{realSliceName}}Actions.setStatus({status: Status.error, error: "An error occured while fetching {{realSliceName}}."}))
+  }
+}
+
+export function* update{{TypeName}}(action: PayloadAction<Update<{{TypeName}}>>){
+  const {{camelCase TypeName}}: {{TypeName}} | undefined = yield select((state: RootState) => select{{TypeName}}ById(state, action.payload.id as string))
+  try {
+    if (!{{camelCase TypeName}}) throw new Error();
+    yield put({{realSliceName}}Actions.updateOne(action.payload));
+    yield call(updateOne, action.payload);
+  } catch(error) {
+    if ({{camelCase TypeName}}){
+      let {id, ...changes} = {{camelCase TypeName}};
+      yield put({{realSliceName}}Actions.updateOne({id, changes}));
+    }
+    yield put({{realSliceName}}Actions.setStatus({status: Status.error, error: "An error occured while updating a {{camelCase TypeName}}."}))
+  }
+}
+
+export function* create{{TypeName}}(action: PayloadAction<{{TypeName}}Creator>){
+  try {
+    yield call(createOne, action.payload);
+  } catch(error) {
+    yield put({{realSliceName}}Actions.setStatus({status: Status.error, error: "An error occured while creating a {{camelCase TypeName}}."}))
+  }
+}
+
+export function* delete{{TypeName}}(action: PayloadAction<string>){
+  const {{camelCase TypeName}}: {{TypeName}} | undefined = yield select((state: RootState) => select{{TypeName}}ById(state, action.payload))
+  try {
+  if (!{{camelCase TypeName}}) throw new Error();
+  yield call(deleteOne, action.payload)
+  yield put({{realSliceName}}Actions.removeOne(action.payload))
+  } catch(error){
+    if({{camelCase TypeName}}){
+      yield put({{realSliceName}}Actions.addOne({{camelCase TypeName}}))
+    }
+  yield put({{realSliceName}}Actions.setStatus({status: Status.error, error: "An error occured while deleting a {{camelCase TypeName}}."}))
+  }
+  }
